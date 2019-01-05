@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">UVCCamera</string>
+    <!---->
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <string name="format_1280_720">1280x720</string>
+    <string name="format_640_480">640x480</string>
+    <string name="add_surface">AddSurface</string>
+    <string name="remove_surface">RemoveSurface</string>
+    <string name="add_sub">AddSub</string>
+    <string name="remove_sub">RemoveSub</string>
+    <string name="add_capture_callback">+CaptureCallback</string>
+    <string name="remove_capture_callback">-CaptureCallback</string>
+    <string name="add_preview_callback">+PreviewCallback</string>
+    <string name="remove_preview_callback">-PreviewCallback</string>
+    <string name="double_text">Double</string>
+    <string name="add_sub_text">+</string>
+    <string name="remove_sub_text">-</string>
+</resources>

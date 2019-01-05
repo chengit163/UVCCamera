@@ -1,0 +1,48 @@
+ext {
+    android = [
+            compileSdkVersion  : 25,
+            buildToolsVersion  : "28.0.3",
+            sourceCompatibility: JavaVersion.VERSION_1_8,
+            targetCompatibility: JavaVersion.VERSION_1_8,
+            applicationId      : "com.cit.uvccamera.app",
+            minSdkVersion      : 17,
+            targetSdkVersion   : 25,
+            versionCode        : 1,
+            versionName        : "1.0.0"
+    ]
+
+    dependencies = [
+            //
+            "support-v4"                 : "com.android.support:support-v4:25.3.1",
+            "support-annotations"        : 'com.android.support:support-annotations:25.3.1',
+            "appcompat-v7"               : "com.android.support:appcompat-v7:25.3.1",
+            "recyclerview-v7"            : "com.android.support:recyclerview-v7:25.3.1",
+            //test
+            "junit"                      : "junit:junit:4.12",
+            "runner"                     : "com.android.support.test:runner:1.0.2",
+            "espresso-core"              : "com.android.support.test.espresso:espresso-core:3.0.2",
+            //
+            "leakcanary-android"         : "com.squareup.leakcanary:leakcanary-android:1.6.2",
+            "leakcanary-android-no-op"   : "com.squareup.leakcanary:leakcanary-android-no-op:1.6.2",
+            "leakcanary-support-fragment": "com.squareup.leakcanary:leakcanary-support-fragment:1.6.2",
+            "butterknife"                : "com.jakewharton:butterknife:8.8.1",
+            "butterknife-compiler"       : "com.jakewharton:butterknife-compiler:8.8.1",
+            "utilcode"                   : "com.blankj:utilcode:1.22.7",
+            "eventbus"                   : "org.greenrobot:eventbus:3.1.1"
+    ]
+
+    libs = [
+            //libuvccamera
+            "libuvccamera-versionCode": 1,
+            "libuvccamera-versionName": "1.0.0",
+            "libuvccamera-groupId"    : "com.cit",
+            "libuvccamera-artifactId" : "uvccamera",
+            "libuvccamera-version"    : "1.0.0",
+            //aidl
+            "aidl-versionCode"        : 1,
+            "aidl-versionName"        : "1.0.0",
+            "aidl-groupId"            : "com.cit",
+            "aidl-artifactId"         : "uvccamera-aidl",
+            "aidl-version"            : "1.0.0"
+    ]
+}

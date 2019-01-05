@@ -1,0 +1,44 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
+    buildToolsVersion rootProject.ext.android.buildToolsVersion
+
+    compileOptions {
+        sourceCompatibility rootProject.ext.android.sourceCompatibility
+        targetCompatibility rootProject.ext.android.targetCompatibility
+    }
+
+    defaultConfig {
+        applicationId rootProject.ext.android.applicationId
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
+        versionCode rootProject.ext.android.versionCode
+        versionName rootProject.ext.android.versionName
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation rootProject.ext.dependencies["support-annotations"]
+    implementation rootProject.ext.dependencies["appcompat-v7"]
+    //
+    implementation project(':libuvccamera')
+    implementation project(':aidl')
+    //
+    debugImplementation rootProject.ext.dependencies["leakcanary-android"]
+    releaseImplementation rootProject.ext.dependencies["leakcanary-android-no-op"]
+    // Optional, if you use support library fragments:
+    debugImplementation rootProject.ext.dependencies["leakcanary-support-fragment"]
+    implementation rootProject.ext.dependencies["butterknife"]
+    annotationProcessor rootProject.ext.dependencies["butterknife-compiler"]
+    implementation rootProject.ext.dependencies["utilcode"]
+    implementation rootProject.ext.dependencies["eventbus"]
+}
