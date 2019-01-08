@@ -42,6 +42,7 @@ public:
     void removePreviewDisplay(int id);
     void clearPreviewDisplay();
     int countPreviewDisplay();
+    void lostDisplayWindow(display_window_t *window);
     //
     void startPreview();
     void stopPreview();

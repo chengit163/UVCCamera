@@ -10,7 +10,6 @@ import android.hardware.usb.UsbDevice;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.MemoryFile;
 import android.os.Message;
 import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
@@ -26,8 +25,8 @@ import java.util.List;
 public class CoreClient implements ICore
 {
     private static final String PACKAGE_NAME = "com.cit.uvcamera.app";
-    private static final boolean DEBUG = true;
-    private static final String TAG = CoreClient.class.getSimpleName();
+    private static final boolean DEBUG = false;
+    private static final String TAG = "CoreClient";
 
     private boolean isRelease;
     private final WeakReference<Context> mWeakContext;

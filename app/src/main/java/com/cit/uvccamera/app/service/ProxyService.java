@@ -24,7 +24,7 @@ import java.util.List;
 public class ProxyService extends BaseService implements ICore
 {
     private static final boolean DEBUG = true;
-    private static final String TAG = ProxyService.class.getSimpleName();
+    private static final String TAG = "ProxyService";
 
     public class ProxyServiceBinder extends Binder
     {

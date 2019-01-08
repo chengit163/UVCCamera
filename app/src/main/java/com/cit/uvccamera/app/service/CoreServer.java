@@ -20,15 +20,17 @@ import java.lang.ref.WeakReference;
 public class CoreServer extends Handler
 {
 
-    private static final boolean DEBUG = true;
-    private static final String TAG = CoreServer.class.getSimpleName();
+    private static final boolean DEBUG = false;
+    private static final String TAG = "CoreServer";
 
     private boolean isRelease;
     private final int mServerId;
     private final WeakReference<CoreThread> mWeakThread;
     private final RemoteCallbackList<ICoreServiceCallback> mCoreServiceCallbacks = new RemoteCallbackList<ICoreServiceCallback>();
     private final RemoteCallbackList<ISharedServiceCallback> mCaptureSharedCallbacks = new RemoteCallbackList<ISharedServiceCallback>();
+    private int mCaptureSharedCallbacksCount;//记录Capture分享个数
     private final RemoteCallbackList<ISharedServiceCallback> mPreviewSharedCallbacks = new RemoteCallbackList<ISharedServiceCallback>();
+    private int mPreviewSharedCallbacksCount;//记录Preview分享个数
 
     /**
      * Constructor
@@ -174,7 +176,6 @@ public class CoreServer extends Handler
     //---ICoreServiceCallback
     //==================================================
 
-
     //==================================================
     //+++ISharedServiceCallback Capture
     //==================================================
@@ -183,7 +184,14 @@ public class CoreServer extends Handler
         if (mCaptureSharedCallbacks.register(callback))
         {
             // 注册时，触发一些回调
-            sendMessage(obtainMessage(MSG_ADD_CAPTURE_CALLBACK, callback));
+            mCaptureSharedCallbacksCount = mCaptureSharedCallbacks.getRegisteredCallbackCount();
+            if (mCaptureSharedCallbacksCount > 0)
+            {
+                removeMessages(MSG_CHECK_CAPTURE_CALLBACK);//检测（避免client没有注销就已经崩溃了）
+                sendMessage(obtainMessage(MSG_ADD_CAPTURE_CALLBACK, callback));
+                //
+                sendEmptyMessageDelayed(MSG_CHECK_CAPTURE_CALLBACK, 1000);
+            }
             return true;
         }
         return false;
@@ -201,13 +209,31 @@ public class CoreServer extends Handler
             {
                 Log.w(TAG, e);
             }
-            if (0 == mCaptureSharedCallbacks.getRegisteredCallbackCount())
+            mCaptureSharedCallbacksCount = mCaptureSharedCallbacks.getRegisteredCallbackCount();
+            if (mCaptureSharedCallbacksCount == 0)
             {
+                removeMessages(MSG_CHECK_CAPTURE_CALLBACK);//移除检测
                 sendEmptyMessage(MSG_REMOVE_CAPTURE_CALLBACK);
             }
             return true;
         }
         return false;
+    }
+
+    private void checkCaptureCallback()
+    {
+        if (mCaptureSharedCallbacksCount > 0)
+        {
+            mCaptureSharedCallbacksCount = mCaptureSharedCallbacks.getRegisteredCallbackCount();
+            if (mCaptureSharedCallbacksCount == 0)
+            {
+                Log.w(TAG, "capture shared useless");
+                sendEmptyMessage(MSG_REMOVE_CAPTURE_CALLBACK);
+            } else
+            {
+                sendEmptyMessageDelayed(MSG_CHECK_CAPTURE_CALLBACK, 1000);
+            }
+        }
     }
 
     private void onUpdatedCaptureCallback(int available)
@@ -244,7 +270,15 @@ public class CoreServer extends Handler
         if (mPreviewSharedCallbacks.register(callback))
         {
             // 注册时，触发一些回调
-            sendMessage(obtainMessage(MSG_ADD_PREVIEW_CALLBACK, callback));
+            mPreviewSharedCallbacksCount = mPreviewSharedCallbacks.getRegisteredCallbackCount();
+            if (mPreviewSharedCallbacksCount > 0)
+            {
+                removeMessages(MSG_CHECK_PREVIEW_CALLBACK);//检测（避免client没有注销就已经崩溃了）
+                sendMessage(obtainMessage(MSG_ADD_PREVIEW_CALLBACK, callback));
+                //
+                sendEmptyMessageDelayed(MSG_CHECK_PREVIEW_CALLBACK, 1000);
+            }
+
             return true;
         }
         return false;
@@ -262,13 +296,31 @@ public class CoreServer extends Handler
             {
                 Log.w(TAG, e);
             }
-            if (0 == mPreviewSharedCallbacks.getRegisteredCallbackCount())
+            mPreviewSharedCallbacksCount = mPreviewSharedCallbacks.getRegisteredCallbackCount();
+            if (mPreviewSharedCallbacksCount == 0)
             {
+                removeMessages(MSG_CHECK_PREVIEW_CALLBACK);//移除检测
                 sendEmptyMessage(MSG_REMOVE_PREVIEW_CALLBACK);
             }
             return true;
         }
         return false;
+    }
+
+    private void checkPreviewCallback()
+    {
+        if (mPreviewSharedCallbacksCount > 0)
+        {
+            mPreviewSharedCallbacksCount = mPreviewSharedCallbacks.getRegisteredCallbackCount();
+            if (mPreviewSharedCallbacksCount == 0)
+            {
+                Log.w(TAG, "preview shared useless");
+                sendEmptyMessage(MSG_REMOVE_PREVIEW_CALLBACK);
+            } else
+            {
+                sendEmptyMessageDelayed(MSG_CHECK_PREVIEW_CALLBACK, 1000);
+            }
+        }
     }
 
     private void onUpdatedPreviewCallback(int available)
@@ -311,7 +363,12 @@ public class CoreServer extends Handler
 
     public void release()
     {
-        sendEmptyMessage(MSG_RELEASE);
+        if (!isRelease)
+        {
+            isRelease = true;
+            removeCallbacksAndMessages(null);
+            sendEmptyMessage(MSG_RELEASE);
+        }
     }
 
     public void connect(String name, int fd)
@@ -346,8 +403,10 @@ public class CoreServer extends Handler
     private static final int MSG_REMOVE_SURFACE = 5;
     private static final int MSG_ADD_CAPTURE_CALLBACK = 6;
     private static final int MSG_REMOVE_CAPTURE_CALLBACK = 7;
-    private static final int MSG_ADD_PREVIEW_CALLBACK = 8;
-    private static final int MSG_REMOVE_PREVIEW_CALLBACK = 9;
+    private static final int MSG_CHECK_CAPTURE_CALLBACK = 8;
+    private static final int MSG_ADD_PREVIEW_CALLBACK = 9;
+    private static final int MSG_REMOVE_PREVIEW_CALLBACK = 10;
+    private static final int MSG_CHECK_PREVIEW_CALLBACK = 11;
 
     @Override
     public void handleMessage(Message msg)
@@ -382,11 +441,17 @@ public class CoreServer extends Handler
             case MSG_REMOVE_CAPTURE_CALLBACK:
                 thread.handleRemoveCaptureCallback();
                 break;
+            case MSG_CHECK_CAPTURE_CALLBACK:
+                thread.handleCheckCaptureCallback();
+                break;
             case MSG_ADD_PREVIEW_CALLBACK:
                 thread.handleAddPreviewCallback((ISharedServiceCallback) msg.obj);
                 break;
             case MSG_REMOVE_PREVIEW_CALLBACK:
                 thread.handleRemovePreviewCallback();
+                break;
+            case MSG_CHECK_PREVIEW_CALLBACK:
+                thread.handleCheckPreviewCallback();
                 break;
         }
     }
@@ -628,6 +693,11 @@ public class CoreServer extends Handler
             }
         }
 
+        private void handleCheckCaptureCallback()
+        {
+            mHandler.checkCaptureCallback();
+        }
+
         private void handleAddPreviewCallback(ISharedServiceCallback callback)
         {
             synchronized (mSync)
@@ -652,6 +722,11 @@ public class CoreServer extends Handler
             {
                 mUVCCamera.previewCloseShared();
             }
+        }
+
+        private void handleCheckPreviewCallback()
+        {
+            mHandler.checkPreviewCallback();
         }
         //==================================================
         //---

@@ -54,12 +54,14 @@ public interface ICore
 
     /**
      * 原始流数据
+     *
      * @param callback null for cancel
      */
     void setCaptureCallback(ISharedCallback callback);
 
     /**
      * 解码流数据
+     *
      * @param callback null for cancel
      */
     void setPreviewCallback(ISharedCallback callback);

@@ -1,4 +1,4 @@
-#if 0
+#if 1
 #ifndef LOG_NDEBUG
 #define	LOG_NDEBUG
 #endif

@@ -11,9 +11,8 @@ MjpegPreview::~MjpegPreview()
 
 //====================================================================================================
 
-static void
-copyFrame(const uint8_t *src, uint8_t *dest, const int width, int height, const int stride_src,
-          const int stride_dest)
+static void copyFrame(const uint8_t *src, uint8_t *dest, const int width, int height,
+                      const int stride_src, const int stride_dest)
 {
     const int h8 = height % 8;
     for (int i = 0; i < h8; i++)
@@ -51,12 +50,13 @@ copyFrame(const uint8_t *src, uint8_t *dest, const int width, int height, const 
     }
 }
 
-void copyToSurface(uint8_t *data, ANativeWindow **window, int Width, int Height)
+int copyToSurface(uint8_t *data, ANativeWindow **window, int Width, int Height)
 {
+    int result = -1;
     if (LIKELY(*window))
     {
         ANativeWindow_Buffer buffer;
-        if (ANativeWindow_lock(*window, &buffer, NULL) == 0)
+        if ((result = ANativeWindow_lock(*window, &buffer, NULL)) == 0)
         {
             // source = frame data
             const uint8_t *src = data;
@@ -75,6 +75,7 @@ void copyToSurface(uint8_t *data, ANativeWindow **window, int Width, int Height)
             ANativeWindow_unlockAndPost(*window);
         }
     }
+    return result;
 }
 
 //====================================================================================================
@@ -84,6 +85,7 @@ void MjpegPreview::handleMainLooper(JNIEnv *env)
     TurboJpegUtils::instance()->init();
     frame_stream_t *colors = frame_stream_create(mWidth * mHeight * 4);
     frame_stream_t *yuv = frame_stream_create(mWidth * mHeight * 3 / 2);
+    ObjectArray<int> lostIndexs;
 
     while (isRunning())
     {
@@ -92,28 +94,48 @@ void MjpegPreview::handleMainLooper(JNIEnv *env)
         {
             if (CALL_SUCCESS == TurboJpegUtils::instance()->mjpeg2yuvx(frame, yuv))
             {
+                int size = 0; // 预览数
                 threadLock();
                 onShared(env, yuv->data, yuv->data_bytes);
+                size = mDisplayWindows.size();// 初次获取预览数
                 threadUnlock();
-                if (CALL_SUCCESS == TurboJpegUtils::instance()->yuvx2rgbx(yuv, colors))
+                if (size > 0)
                 {
-                    threadLock();
-                    int size = mDisplayWindows.size();
-                    for (int i = 0; i < size; i++)
+                    // 预览数大于0，解码yuv
+                    if (CALL_SUCCESS == TurboJpegUtils::instance()->yuvx2rgbx(yuv, colors))
                     {
-                        display_window_t *display = mDisplayWindows.get(i);
-                        if (LIKELY(display))
+                        threadLock();
+                        size = mDisplayWindows.size();//再次获取预览数
+                        for (int i = 0; i < size; i++)
                         {
-                            copyToSurface((uint8_t *) colors->data, &display->window, mWidth, mHeight);
+                            display_window_t *display = mDisplayWindows.get(i);
+                            if (LIKELY(display))
+                            {
+                                int result = copyToSurface((uint8_t *) colors->data,
+                                                           &display->window,
+                                                           mWidth, mHeight);
+                                if (0 != result)
+                                {
+                                    int index = i + 1;//避免 if LIKELY(0) (+1非零)
+                                    lostIndexs.put(index);//上屏失败，认为该Surface已失效
+                                }
+                            }
                         }
+                        while (!lostIndexs.isEmpty())
+                        {
+                            int index = lostIndexs.last() - 1;//避免 if LIKELY(0) (-1还远)
+                            display_window_t *display = mDisplayWindows.remove(index);
+                            lostDisplayWindow(display);
+                        }
+                        threadUnlock();
                     }
-                    threadUnlock();
                 }
             }
             mFramePool->pushCacheFrame(frame);
         }
     }
 
+    lostIndexs.clear();
     frame_stream_recycle(colors);
     TurboJpegUtils::instance()->uninit();
 }

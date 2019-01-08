@@ -70,6 +70,15 @@ int AbstractPreview::countPreviewDisplay()
     return mDisplayWindows.size();
 }
 
+void AbstractPreview::lostDisplayWindow(display_window_t *window)
+{
+    if (LIKELY(window))
+    {
+        LOGW("lost surface: %d", window->id);
+        recycleDisplayWindow(window);
+    }
+}
+
 //====================================================================================================
 void AbstractPreview::startPreview()
 {

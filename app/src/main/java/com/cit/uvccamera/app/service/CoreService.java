@@ -26,7 +26,7 @@ import java.util.Set;
 public class CoreService extends BaseService
 {
     private static final boolean DEBUG = true;
-    private static final String TAG = CoreService.class.getSimpleName();
+    private static final String TAG = "CoreService";
 
     @Nullable
     @Override
@@ -64,7 +64,7 @@ public class CoreService extends BaseService
     public void onCreate()
     {
         super.onCreate();
-        mUsbDevices = UsbDeviceManager.loadUsbDevices(this);
+        loadUsbDevices();
         if (mUSBMonitor == null)
         {
             mUSBMonitor = new USBMonitor(this, mOnDeviceConnectListener);
@@ -85,6 +85,15 @@ public class CoreService extends BaseService
         mRequestPermission.clear();
         mUsbDevices.clear();
         super.onDestroy();
+    }
+
+    /**
+     *
+     */
+    private void loadUsbDevices()
+    {
+//        mUsbDevices = UsbDeviceManager.loadUsbDevices(this);
+        mUsbDevices = UsbDeviceManager.listFromDevBus(mContext);
     }
 
     private void tryRequestPermission(UsbDevice device)
@@ -119,7 +128,7 @@ public class CoreService extends BaseService
             if (device != null &&
                     device.getDeviceClass() == 239 && device.getDeviceSubclass() == 2)
             {
-                mUsbDevices = UsbDeviceManager.loadUsbDevices(mContext);
+                loadUsbDevices();
             }
         }
 
@@ -133,7 +142,7 @@ public class CoreService extends BaseService
             {
                 removeCoreServer(device.getDeviceName().hashCode());
                 checkVideos();
-                mUsbDevices = UsbDeviceManager.loadUsbDevices(mContext);
+                loadUsbDevices();
             }
         }
 
@@ -291,7 +300,7 @@ public class CoreService extends BaseService
         public List<UsbDevice> listUsbDevice() throws RemoteException
         {
             if (DEBUG) Log.d(TAG, "listUsbDevice: ");
-            mUsbDevices = UsbDeviceManager.loadUsbDevices(mContext);
+            loadUsbDevices();
             return mUsbDevices;
         }
 
