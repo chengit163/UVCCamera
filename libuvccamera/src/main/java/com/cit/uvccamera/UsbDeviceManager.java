@@ -54,12 +54,15 @@ public class UsbDeviceManager
         {
             for (String name : names)
             {
-                String filename = "/dev/" + name;
-                File file = new File(filename);
-                if (file.exists())
+                if (name.startsWith("video"))
                 {
-                    UsbDevice device = createUsbDevice(filename);
-                    usbDevices.add(device);
+                    String filename = "/dev/" + name;
+                    File file = new File(filename);
+                    if (file.exists())
+                    {
+                        UsbDevice device = createUsbDevice(filename);
+                        usbDevices.add(device);
+                    }
                 }
             }
         }

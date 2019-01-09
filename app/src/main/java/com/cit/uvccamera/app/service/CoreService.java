@@ -92,8 +92,8 @@ public class CoreService extends BaseService
      */
     private void loadUsbDevices()
     {
-//        mUsbDevices = UsbDeviceManager.loadUsbDevices(this);
-        mUsbDevices = UsbDeviceManager.listFromDevBus(mContext);
+        mUsbDevices = UsbDeviceManager.loadUsbDevices(this);
+//        mUsbDevices = UsbDeviceManager.listFromDevBus(mContext);
     }
 
     private void tryRequestPermission(UsbDevice device)
