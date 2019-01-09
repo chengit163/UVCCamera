@@ -1,11 +1,11 @@
 ext {
     android = [
             compileSdkVersion  : 27,
-            buildToolsVersion  : "28.0.3",
+            buildToolsVersion  : "27.0.3",
             sourceCompatibility: JavaVersion.VERSION_1_8,
             targetCompatibility: JavaVersion.VERSION_1_8,
             applicationId      : "com.cit.uvccamera.app",
-            minSdkVersion      : 17,
+            minSdkVersion      : 14,
             targetSdkVersion   : 25,
             versionCode        : 1,
             versionName        : "1.0.0"
