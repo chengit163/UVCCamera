@@ -79,7 +79,7 @@ public class MainApplication extends Application
                 // 当全局标签不为空时，我们输出的 log 全部为该 tag，
                 // 为空时，如果传入的 tag 为空那就显示类名，否则显示 tag
                 .setLogHeadSwitch(false)// 设置 log 头信息开关，默认为开
-                .setLog2FileSwitch(true)// 打印 log 时是否存到文件的开关，默认关
+                .setLog2FileSwitch(false)// 打印 log 时是否存到文件的开关，默认关
                 .setDir("")// 当自定义路径为空时，写入应用的/cache/log/目录中
                 .setFilePrefix(fix)// 当文件前缀为空时，默认为"util"，即写入文件为"util-yyyy-MM-dd.txt"
                 .setBorderSwitch(true)// 输出日志是否带边框开关，默认开

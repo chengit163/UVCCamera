@@ -12,6 +12,7 @@ import com.cit.uvccamera.aidl.CoreClient;
 import com.cit.uvccamera.aidl.ICore;
 import com.cit.uvccamera.aidl.ICoreCallback;
 import com.cit.uvccamera.aidl.ISharedCallback;
+import com.cit.uvccamera.app.BuildConfig;
 import com.cit.uvccamera.app.base.BaseService;
 import com.cit.uvccamera.app.event.Event;
 import com.cit.uvccamera.app.event.EventFactory;
@@ -112,7 +113,11 @@ public class ProxyService extends BaseService implements ICore
     public void onCreate()
     {
         super.onCreate();
-        mCore = Wrap.wrap(new CoreClient(getApplicationContext(), Wrap.wrap(mCoreCallback)));
+        // DEBUG版本打印日志
+        if (BuildConfig.DEBUG)
+            mCore = Wrap.wrap(new CoreClient(getApplicationContext(), Wrap.wrap(mCoreCallback)));
+        else
+            mCore = new CoreClient(getApplicationContext(), mCoreCallback);
     }
 
     @Override

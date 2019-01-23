@@ -96,6 +96,7 @@ void ILooper::looperThreadFunc()
     // attach to JavaVM
     vm->AttachCurrentThread(&env, NULL);
     handleMainLooper(env);
+    afterHandleMainLooper(env);
     // detach from JavaVM
     vm->DetachCurrentThread();
     MARK("DetachCurrentThread");
