@@ -13,6 +13,8 @@ LOCAL_C_INCLUDES := \
 		$(LOCAL_PATH)/ \
 		$(LOCAL_PATH)/../ \
 
+LOCAL_CPPFLAGS += -std=c++11
+
 LOCAL_CFLAGS := $(LOCAL_C_INCLUDES:%=-I%)
 LOCAL_CFLAGS += -DANDROID_NDK
 LOCAL_CFLAGS += -DLOG_NDEBUG
@@ -22,6 +24,8 @@ LOCAL_CFLAGS += -O3 -fstrict-aliasing -fprefetch-loop-arrays
 LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -ldl
 LOCAL_LDLIBS += -llog
 LOCAL_LDLIBS += -landroid
+LOCAL_LDLIBS += -lGLESv2
+LOCAL_LDLIBS += -lEGL
 
 LOCAL_SHARED_LIBRARIES += jpeg-turbo-1.5.3 usb uvc
 # LOCAL_STATIC_LIBRARIES += 
