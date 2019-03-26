@@ -26,5 +26,4 @@ implementation 'com.cit:uvccamera-aidl:1.0.0'
 ```
 
 - 基于安装了UVCCamera.apk, 使用aidl library的例子:   
-[AVILibSample](https://github.com/chengit163/AVILibSample)   
-[H264Demo](https://github.com/chengit163/H264Demo)   
+[H264Demo](https://github.com/chengit163/H264Demo)

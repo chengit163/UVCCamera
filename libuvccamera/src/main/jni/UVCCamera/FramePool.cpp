@@ -64,6 +64,7 @@ void FramePool::addFrame(frame_stream_t *frame)
     int size = mFrames.size();
     if (size > MAX_FRAME_SZ)
     {
+        LOGW("throw frame");
         frame_stream_t *old = mFrames.remove(0);
         frame_stream_recycle(old);
     }
